@@ -12,5 +12,5 @@ maintainer = "Michael Scholtz"
 depends = {
 	"lua ~> 5.1",
 	"luametrics = 0.2.1",
-	"luadb = x.x.x" -- needs to be fixed
+	"luadb = 0.0.1"
 }
