@@ -1,0 +1,16 @@
+--- This dist file is part of LuaDist project
+
+name = "luatree"
+version = "0.0.1"
+
+desc = "luatree is a module to analyze data structures provided by luametrics and luadb modules"
+author = "Michael Scholtz, Peter Kapec"
+license = "MIT"
+url = "https://github.com/scholtzm/luatree"
+maintainer = "Michael Scholtz"
+
+depends = {
+	"lua ~> 5.1",
+	"luametrics = 0.2.1",
+	"luadb = x.x.x" -- needs to be fixed
+}
