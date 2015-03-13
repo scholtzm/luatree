@@ -1,5 +1,5 @@
 ---------------------------------------------
--- luagraph
+-- graph module
 -- luadb graph toolkit
 -- @author: Michael Scholtz
 ---------------------------------------------

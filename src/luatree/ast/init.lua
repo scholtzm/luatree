@@ -1,5 +1,5 @@
 ---------------------------------------------
--- luatree
+-- AST module
 -- AST toolkit for Lua
 -- @author: Michael Scholtz
 ---------------------------------------------
