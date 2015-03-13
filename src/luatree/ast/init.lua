@@ -5,7 +5,7 @@
 ---------------------------------------------
 
 local metrics = require("metrics")
-local utils = require("utils")
+local utils = require("luatree.utils")
 
 ---------------------------------------------
 -- Constants & Private methods
