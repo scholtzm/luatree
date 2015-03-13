@@ -7,7 +7,6 @@
 local extractor = require("luadb.extraction.functioncalls")
 local hypergraph = require("luadb.hypergraph")
 local utils = require("luatree.utils")
-local pretty = require("pl.pretty")
 
 ---------------------------------------------
 -- Constants & Private methods
