@@ -1,5 +1,7 @@
 # Folders
 
 # Files
+ast_test.lua
+graph_test.lua
 .random.lua
 .DS_Store

@@ -7,5 +7,6 @@
 return {
     ast = require("luatree.ast"),
     graph = require("luatree.graph"),
-    bridge = require("luatree.bridge")
+    bridge = require("luatree.bridge"),
+    utils = require("luatree.utils")
 }

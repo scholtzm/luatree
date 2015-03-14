@@ -18,18 +18,45 @@ local logger = logging.new(
 )
 
 --- AST tree debugger.
--- Helper function to debug and visualize AST trees.
+-- Helper function to debug and visualize AST trees... and ignore the rest.
 -- @param t valid AST tree
 -- @param keychain optional parameter to modify keychain
 local function print_tree(t, keychain)
     keychain = keychain or ""
 
     for k, v in pairs(t) do
-        if k ~= "parent" then
+           -- ignore parent
+        if k ~= "parent" and
+           -- ignore all hypergraph cyclic stuff
+           k ~= "hypergraph" and k ~= "hypergraphnode" and k ~= "nodeid_references" and
+           -- ignore metrics and luaDoc stuff
+           k ~= "metrics" and k ~= "luaDoc_functions" and k ~= "luaDoc_tables"
+           then
             if type(v) == "table" then
-                print_tree(v, keychain .. "[" .. k .. "]")
+                print_tree(v, keychain .. "[" .. tostring(k) .. "]")
             else
-                print(keychain .. "[" .. k .. "] " .. tostring(v))
+                print(keychain .. "[" .. tostring(k) .. "] " .. tostring(v))
+            end
+        end
+    end
+end
+
+--- Hypergraph debugger
+-- Helper function to debug and viualize Hypergraph produced by luametrics
+-- REMARK: You can also call this function with only list of 'Nodes'
+-- or list of 'Edges' accordingly
+-- @param t valid Hypergraph or see remark
+-- @param keychain optional parameter to modify keychain
+local function print_hypergraph(t, keychain)
+    keychain = keychain or ""
+
+    for k, v in pairs(t) do
+        -- These are either 'huge' or cause recurssion - no reason to print these
+        if k ~= "parent" and k ~= "hypergraphnode" and k ~= "metrics" and k ~= "data" then
+            if type(v) == "table" then
+                print_hypergraph(v, keychain .. "[" .. tostring(k) .. "]")
+            else
+                print(keychain .. "[" .. tostring(k) .. "] " .. tostring(v))
             end
         end
     end
@@ -69,9 +96,9 @@ local function print_graph(t, keychain)
 
     for k, v in pairs(t) do
         if type(v) == "table" and  k ~= "parent"  and k ~= "metrics" then
-            print_graph(v, keychain .. "[" .. k .. "]")
+            print_graph(v, keychain .. "[" .. tostring(k) .. "]")
         else
-            print(keychain .. "[" .. k .. "] " .. tostring(v))
+            print(keychain .. "[" .. tostring(k) .. "] " .. tostring(v))
         end
     end
 end
@@ -164,6 +191,7 @@ return {
     logger = logger,
     -- ast
     print_tree = print_tree,
+    print_hypergraph = print_hypergraph,
     print_tree_flags = print_tree_flags,
     get_tree_flag_count = get_tree_flag_count,
     -- graph

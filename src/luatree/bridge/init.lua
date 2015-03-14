@@ -27,8 +27,8 @@ local utils = require("luatree.utils")
 -- @param data_ast AST tree provided by luametrics
 -- @param data_graph Function call graph provided by luadb
 local function merge_graph_into_AST(data_ast, data_graph)
-	assert(data_ast.hypergraph ~= nil, "data_ast does not contain 'hypergraph' data")
-	return data_ast
+    assert(data_ast.hypergraph ~= nil, "data_ast does not contain 'hypergraph' data")
+    return data_ast
 end
 
 ---------------------------------------------
