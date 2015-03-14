@@ -21,11 +21,11 @@ local SEPARATOR = ":"
 -- @param edge Hypergraph edge
 -- @return string Hash
 local function edge_hash(edge)
-	local edge_from = edge.meta.calleeFunction
-	local edge_to = edge.meta.calledFunction
-	local edge_text = edge.data.text
+    local edge_from = edge.meta.calleeFunction
+    local edge_to = edge.meta.calledFunction
+    local edge_text = edge.data.text
 
-	return tostring(edge_from) .. SEPARATOR .. tostring(edge_to) .. SEPARATOR .. tostring(edge_text)
+    return tostring(edge_from) .. SEPARATOR .. tostring(edge_to) .. SEPARATOR .. tostring(edge_text)
 end
 
 --- Get edge information from its hash.
@@ -52,14 +52,14 @@ end
 -- @param edge2 Second hypergraph edge
 -- @return boolean Result of comparison
 local function equal_edges(edge1, edge2)
-	local hash1 = edge_hash(edge1)
-	local hash2 = edge_hash(edge2)
+    local hash1 = edge_hash(edge1)
+    local hash2 = edge_hash(edge2)
 
-	if hash1 == hash2 then
-		return true
-	else
-		return false
-	end
+    if hash1 == hash2 then
+        return true
+    else
+        return false
+    end
 end
 
 --- Summarize list of nodes into a hash table.
@@ -67,14 +67,14 @@ end
 -- @param graph Hypergraph
 -- @return table Summary of functions
 local function summarize_nodes(graph)
-	local functions = {}
+    local functions = {}
 
     for i, v in ipairs(graph.nodes) do
         local func_name = v.data.name
         if functions[func_name] == nil then
-        	functions[func_name] = 1
+            functions[func_name] = 1
         else
-        	functions[func_name] = functions[func_name] + 1
+            functions[func_name] = functions[func_name] + 1
         end
     end
 
@@ -138,20 +138,20 @@ end
 -- @param string Source code
 -- @return graph Graph of funtion calls
 local function get_graph(string)
-	local function_calls_graph = hypergraph.graph.new()
-	extractor.extractFromString(string, function_calls_graph)
+    local function_calls_graph = hypergraph.graph.new()
+    extractor.extractFromString(string, function_calls_graph)
 
-	return function_calls_graph
+    return function_calls_graph
 end
 
 --- Function to get function graph from file.
 -- @param file File path
 -- @return graph Graph of funtion calls
 local function get_graph_from_file(file)
-	local function_calls_graph = hypergraph.graph.new()
-	extractor.extract(file, function_calls_graph)
+    local function_calls_graph = hypergraph.graph.new()
+    extractor.extract(file, function_calls_graph)
 
-	return function_calls_graph
+    return function_calls_graph
 end
 
 --- Function to get function graph from existing AST tree.
@@ -170,33 +170,33 @@ end
 -- @param graph_old Old function call graph returned from `get_graph` function
 local function compare(graph_old, graph_new)
 
-	-- Let's compare list of nodes first
-	for i, v in ipairs(graph_new.nodes) do
-	    for ii, vv in ipairs(graph_old.nodes) do
-	    	if vv.flag ~= "visited" and v.data.name == vv.data.name then
-	    		v.flag = "identical"
-	    		vv.flag = "visited"
-	    		break
-	    	end
-	    end
-	    if v.flag == nil then
-	    	v.flag = "created"
-	    end
-	end
+    -- Let's compare list of nodes first
+    for i, v in ipairs(graph_new.nodes) do
+        for ii, vv in ipairs(graph_old.nodes) do
+            if vv.flag ~= "visited" and v.data.name == vv.data.name then
+                v.flag = "identical"
+                vv.flag = "visited"
+                break
+            end
+        end
+        if v.flag == nil then
+            v.flag = "created"
+        end
+    end
 
-	-- Compare edges
-	for i, v in ipairs(graph_new.edges) do
-		for ii, vv in ipairs(graph_old.edges) do
-			if vv.flag ~= "visited" and equal_edges(v, vv) then
-				v.flag = "identical"
-				vv.flag = "visited"
-				break
-			end
-		end
-		if v.flag == nil then
-			v.flag = "created"
-		end
-	end
+    -- Compare edges
+    for i, v in ipairs(graph_new.edges) do
+        for ii, vv in ipairs(graph_old.edges) do
+            if vv.flag ~= "visited" and equal_edges(v, vv) then
+                v.flag = "identical"
+                vv.flag = "visited"
+                break
+            end
+        end
+        if v.flag == nil then
+            v.flag = "created"
+        end
+    end
 end
 
 -- Function to generate a diff of 2 call graphs.
@@ -240,8 +240,8 @@ end
 ---------------------------------------------
 
 return {
-	get_graph = get_graph,
-	get_graph_from_file = get_graph_from_file,
+    get_graph = get_graph,
+    get_graph_from_file = get_graph_from_file,
     get_graph_from_AST = get_graph_from_AST,
     compare = compare,
     diff = diff
