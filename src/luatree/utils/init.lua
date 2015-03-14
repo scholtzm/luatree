@@ -191,6 +191,7 @@ return {
     logger = logger,
     -- ast
     print_tree = print_tree,
+    print_hypergraph = print_hypergraph,
     print_tree_flags = print_tree_flags,
     get_tree_flag_count = get_tree_flag_count,
     -- graph
