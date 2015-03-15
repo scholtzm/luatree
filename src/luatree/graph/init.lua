@@ -235,6 +235,35 @@ local function patch(graph, diff)
     -- tbd
 end
 
+--- Get edges by their data.position info
+-- Function to retrieve all edges which contain data with specific position
+-- @param graph luadb.hypergraph
+-- @param position position in source code
+-- @return table with edges
+local function get_edges_by_position(graph, position)
+    local result = {}
+
+    for _, edge in ipairs(graph.edges) do
+        for __, from in ipairs(edge.from) do
+            if from.data.position == position then
+                local edge = edge
+                edge.data.role = "caller"
+                table.insert(result, edge)
+            end
+        end
+
+        for __, to in ipairs(edge.to) do
+            if to.data.position == position then
+                local edge = edge
+                edge.data.role = "callee"
+                table.insert(result, edge)
+            end
+        end
+    end
+
+    return result
+end
+
 ---------------------------------------------
 -- Module definition
 ---------------------------------------------
@@ -244,5 +273,6 @@ return {
     get_graph_from_file = get_graph_from_file,
     get_graph_from_AST = get_graph_from_AST,
     compare = compare,
-    diff = diff
+    diff = diff,
+    get_edges_by_position = get_edges_by_position
 }
