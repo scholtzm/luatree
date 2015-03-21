@@ -148,6 +148,32 @@ local function get_graph_flag_count(graph, flag_type)
     return count_nodes+count_edges, count_nodes, count_edges 
 end
 
+--- Simple function to print all function calls.
+-- This function prints function calls added using
+-- merge_graph_into_AST function.
+-- @param ast AST tree produced by luametrics
+function print_all_hypergraph_calls(ast)
+    local hypergraph = ast.hypergraph or ast
+
+    for node in pairs(hypergraph.Nodes) do
+        for incidence, edge in pairs(hypergraph[node]) do
+            if incidence.label == 'caller' and edge.label == 'call' then
+                local message = "Caller: " .. node.data.name .. " @ " .. node.data.position .. "; "
+
+                for incidence, node in pairs(hypergraph[edge]) do
+                    if incidence.label == "callee" then
+                        message = message .. "Callee: " .. node.data.name .. " @ " .. node.data.position .. "; "
+                    elseif incidence.label == "callpoint" then
+                        message = message .. "Callpoint: " .. node.data.str .. " @ " .. node.data.position .. "; "
+                    end
+                end
+
+                print(message)
+            end
+        end
+    end
+end
+
 --- Helper function to print table.
 -- @param table Lua table
 local function print_table(table)
@@ -199,6 +225,8 @@ return {
     print_graph_simple = print_graph_simple,
     print_graph_flags = print_graph_flags,
     get_graph_flag_count = get_graph_flag_count,
+    -- luametrics hypergraph
+    print_all_hypergraph_calls = print_all_hypergraph_calls,
     -- generic
     print_table = print_table,
     file_exists = file_exists,
