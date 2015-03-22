@@ -3,19 +3,9 @@
 -- @author: Michael Scholtz
 ---------------------------------------------
 
-require("logging")
-
 ---------------------------------------------
 -- Public methods
 ---------------------------------------------
-
---- Logger instance.
-local logger = logging.new(
-    function(self, level, message)
-        print(level, message)
-        return true
-    end
-)
 
 --- AST tree debugger.
 -- Helper function to debug and visualize AST trees... and ignore the rest.
@@ -213,8 +203,6 @@ end
 ---------------------------------------------
 
 return {
-    -- logger
-    logger = logger,
     -- ast
     print_tree = print_tree,
     print_hypergraph = print_hypergraph,
