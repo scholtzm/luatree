@@ -72,7 +72,7 @@ local function merge_graph_into_AST(data_ast, data_graph, create_new_nodes)
         local actual_call = nil
 
         for node in pairs(hypergraph.Nodes) do
-            if node.label == "LocalFunction" or node.label == "GlobalFunction"  then
+            if node.label == "LocalFunction" or node.label == "GlobalFunction" then
                 if node.data.position == from_position then
                     from = node
                 elseif node.data.position == to_position then
