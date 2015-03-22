@@ -13,6 +13,23 @@ local utils = require("luatree.utils")
 -- Constants & Private methods
 ---------------------------------------------
 
+local EXTERNAL_GLOBAL_FUNCTION_LABEL = "eGlobalFunction"
+
+--- Creates external global node.
+-- This function creates new external global function node.
+-- @param id Should be unique nodeid
+-- @param data Data from luadb hypergraph.globalFunctions
+-- @param name Function name
+local function create_eglobal_function_node(id, data, name)
+    local node = HG.N(EXTERNAL_GLOBAL_FUNCTION_LABEL)
+    node.nodeid = id
+    node.data = data
+    node.data.name = name
+    node.data.position = -1
+
+    return node
+end
+
 ---------------------------------------------
 -- Public methods
 ---------------------------------------------
@@ -26,17 +43,25 @@ local utils = require("luatree.utils")
 -- and data_graph
 -- @param data_ast AST tree provided by luametrics
 -- @param data_graph Function call graph provided by luadb
-local function merge_graph_into_AST(data_ast, data_graph)
+-- @param create_new_nodes If true, this function will create
+-- new nodes for GlobalFunctions defined elsewhere. Defaults to false
+local function merge_graph_into_AST(data_ast, data_graph, create_new_nodes)
     assert(data_ast.hypergraph ~= nil, "param data_ast does not containt 'hypergraph' data")
 
+    -- We don't create extra nodes by default
+    local create_new_nodes = create_new_nodes or false
+
+    -- Node ID assigned to custom created nodes from function calls
+    local node_id = -1
     local hypergraph = data_ast.hypergraph
 
     for _, edge in ipairs(data_graph.edges) do
         local from_position = edge.from[1].data.position
         local call_position = edge.data.position
         local to_position = nil
+        local to_function_name = edge.meta.calledFunction
 
-        -- "To" might be empty for global functions defined elsewhere
+        -- "to" might be empty for global functions defined elsewhere
         if edge.to ~= nil and #edge.to > 0 then
             to_position = edge.to[1].data.position
         end
@@ -65,6 +90,21 @@ local function merge_graph_into_AST(data_ast, data_graph)
             end
         end
 
+        -- At this point, "to" might be nil but we might want to create a new node from the globalFunctions info
+        if to == nil and create_new_nodes then
+            -- If "to" is nil, this condition should always evaluate to true, but... just in case ...
+            if data_graph.globalCalls ~= nil and data_graph.globalCalls[to_function_name] ~= nil then
+                -- There might be multiple calls
+                for _, v in ipairs(data_graph.globalCalls[to_function_name]) do
+                    if v.data.position == call_position then
+                        to = create_eglobal_function_node(node_id, v.data, to_function_name)
+
+                        node_id = node_id - 1
+                    end
+                end
+            end
+        end
+
         -- Add new incidence data to edges and nodes
         local new_edge = HG.E'call'
 
@@ -74,6 +114,7 @@ local function merge_graph_into_AST(data_ast, data_graph)
         hypergraph:AddEdgesFromNodeData(actual_call, { [HG.I'callpoint'] = new_edge })
         hypergraph:AddNodesFromEdgeData(new_edge, { [HG.I'callpoint'] = actual_call })
 
+        -- "to" may be still nil if it's a GlobalFunction and create_new_nodes is false
         if to ~= nil then
             hypergraph:AddEdgesFromNodeData(to, { [HG.I'callee'] = new_edge })
             hypergraph:AddNodesFromEdgeData(new_edge, { [HG.I'callee'] = to })

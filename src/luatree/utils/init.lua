@@ -158,13 +158,13 @@ function print_all_hypergraph_calls(ast)
     for node in pairs(hypergraph.Nodes) do
         for incidence, edge in pairs(hypergraph[node]) do
             if incidence.label == 'caller' and edge.label == 'call' then
-                local message = "Caller: " .. node.data.name .. " @ " .. node.data.position .. "; "
+                local message = "Caller: " .. node.data.name .. " (" .. node.label .. ") @ " .. node.data.position .. "; "
 
                 for incidence, node in pairs(hypergraph[edge]) do
                     if incidence.label == "callee" then
-                        message = message .. "Callee: " .. node.data.name .. " @ " .. node.data.position .. "; "
+                        message = message .. "Callee: " .. node.data.name .. " (" .. node.label .. ") @ " .. node.data.position .. "; "
                     elseif incidence.label == "callpoint" then
-                        message = message .. "Callpoint: " .. node.data.str .. " @ " .. node.data.position .. "; "
+                        message = message .. "Callpoint: " .. node.data.str .. " (" .. node.label .. ") @ " .. node.data.position .. "; "
                     end
                 end
 
