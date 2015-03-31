@@ -172,6 +172,16 @@ local function print_table(table)
     end
 end
 
+--- Helper function to detect live tables.
+-- Detects non-empty tables.
+local function live_table(table)
+    if table == nil or #table == 0 then
+        return false
+    end
+
+    return true
+end
+
 --- Helper function to see if file exists.
 -- @param file File path
 local function file_exists(file)
@@ -217,6 +227,7 @@ return {
     print_all_hypergraph_calls = print_all_hypergraph_calls,
     -- generic
     print_table = print_table,
+    live_table = live_table,
     file_exists = file_exists,
     read_file = read_file
 }

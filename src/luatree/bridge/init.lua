@@ -56,68 +56,70 @@ local function merge_graph_into_AST(data_ast, data_graph, create_new_nodes)
     local hypergraph = data_ast.hypergraph
 
     for _, edge in ipairs(data_graph.edges) do
-        local from_position = edge.from[1].data.position
-        local call_position = edge.data.position
-        local to_position = nil
-        local to_function_name = edge.meta.calledFunction
+        if utils.live_table(edge.from) then
+            local from_position = edge.from[1].data.position
+            local call_position = edge.data.position
+            local to_position = nil
+            local to_function_name = edge.meta.calledFunction
 
-        -- "to" might be empty for global functions defined elsewhere
-        if edge.to ~= nil and #edge.to > 0 then
-            to_position = edge.to[1].data.position
-        end
+            -- "to" might be empty for global functions defined elsewhere
+            if edge.to ~= nil and #edge.to > 0 then
+                to_position = edge.to[1].data.position
+            end
 
-        -- These will be actual hypergraph nodes
-        local from = nil
-        local to = nil
-        local actual_call = nil
+            -- These will be actual hypergraph nodes
+            local from = nil
+            local to = nil
+            local actual_call = nil
 
-        for node in pairs(hypergraph.Nodes) do
-            if node.label == "LocalFunction" or node.label == "GlobalFunction" then
-                if node.data.position == from_position then
-                    from = node
-                elseif node.data.position == to_position then
-                    to = node
+            for node in pairs(hypergraph.Nodes) do
+                if node.label == "LocalFunction" or node.label == "GlobalFunction" then
+                    if node.data.position == from_position then
+                        from = node
+                    elseif node.data.position == to_position then
+                        to = node
+                    end
+                elseif node.label == "FunctionCall" then
+                    if node.data.position == call_position then
+                        actual_call = node
+                    end
                 end
-            elseif node.label == "FunctionCall" then
-                if node.data.position == call_position then
-                    actual_call = node
+
+                -- Break if we have all the info necessary
+                if from ~= nil and (to ~= nil or to_position == nil) and actual_call ~= nil then
+                    break
                 end
             end
 
-            -- Break if we have all the info necessary
-            if from ~= nil and (to ~= nil or to_position == nil) and actual_call ~= nil then
-                break
-            end
-        end
+            -- At this point, "to" might be nil but we might want to create a new node from the globalFunctions info
+            if to == nil and create_new_nodes then
+                -- If "to" is nil, this condition should always evaluate to true, but... just in case ...
+                if data_graph.globalCalls ~= nil and data_graph.globalCalls[to_function_name] ~= nil then
+                    -- There might be multiple calls
+                    for _, v in ipairs(data_graph.globalCalls[to_function_name]) do
+                        if v.data.position == call_position then
+                            to = create_eglobal_function_node(node_id, v.data, to_function_name)
 
-        -- At this point, "to" might be nil but we might want to create a new node from the globalFunctions info
-        if to == nil and create_new_nodes then
-            -- If "to" is nil, this condition should always evaluate to true, but... just in case ...
-            if data_graph.globalCalls ~= nil and data_graph.globalCalls[to_function_name] ~= nil then
-                -- There might be multiple calls
-                for _, v in ipairs(data_graph.globalCalls[to_function_name]) do
-                    if v.data.position == call_position then
-                        to = create_eglobal_function_node(node_id, v.data, to_function_name)
-
-                        node_id = node_id - 1
+                            node_id = node_id - 1
+                        end
                     end
                 end
             end
-        end
 
-        -- Add new incidence data to edges and nodes
-        local new_edge = HG.E'call'
+            -- Add new incidence data to edges and nodes
+            local new_edge = HG.E'call'
 
-        hypergraph:AddEdgesFromNodeData(from, { [HG.I'caller'] = new_edge })
-        hypergraph:AddNodesFromEdgeData(new_edge, { [HG.I'caller'] = from })
+            hypergraph:AddEdgesFromNodeData(from, { [HG.I'caller'] = new_edge })
+            hypergraph:AddNodesFromEdgeData(new_edge, { [HG.I'caller'] = from })
 
-        hypergraph:AddEdgesFromNodeData(actual_call, { [HG.I'callpoint'] = new_edge })
-        hypergraph:AddNodesFromEdgeData(new_edge, { [HG.I'callpoint'] = actual_call })
+            hypergraph:AddEdgesFromNodeData(actual_call, { [HG.I'callpoint'] = new_edge })
+            hypergraph:AddNodesFromEdgeData(new_edge, { [HG.I'callpoint'] = actual_call })
 
-        -- "to" may be still nil if it's a GlobalFunction and create_new_nodes is false
-        if to ~= nil then
-            hypergraph:AddEdgesFromNodeData(to, { [HG.I'callee'] = new_edge })
-            hypergraph:AddNodesFromEdgeData(new_edge, { [HG.I'callee'] = to })
+            -- "to" may be still nil if it's a GlobalFunction and create_new_nodes is false
+            if to ~= nil then
+                hypergraph:AddEdgesFromNodeData(to, { [HG.I'callee'] = new_edge })
+                hypergraph:AddNodesFromEdgeData(new_edge, { [HG.I'callee'] = to })
+            end
         end
     end
 end
