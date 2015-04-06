@@ -175,12 +175,25 @@ end
 
 --- Helper function to detect live tables.
 -- Detects non-empty tables.
+-- @param table Lua table
 local function live_table(table)
     if table == nil or #table == 0 then
         return false
     end
 
     return true
+end
+
+--- Counts number of keys in a table.
+-- @param table Lua table
+local function count_table(table)
+    local count = 0
+
+    for _ in pairs(table) do
+        count = count + 1
+    end
+
+    return count
 end
 
 --- Helper function to see if file exists.
@@ -229,6 +242,7 @@ return {
     -- generic
     print_table = print_table,
     live_table = live_table,
+    count_table = count_table,
     file_exists = file_exists,
     read_file = read_file
 }
