@@ -142,7 +142,7 @@ end
 -- This function prints function calls added using
 -- merge_graph_into_AST function.
 -- @param ast AST tree produced by luametrics
-function print_all_hypergraph_calls(ast)
+local function print_all_hypergraph_calls(ast)
     local hypergraph = ast.hypergraph or ast
 
     for node in pairs(hypergraph.Nodes) do
@@ -163,6 +163,23 @@ function print_all_hypergraph_calls(ast)
             end
         end
     end
+end
+
+--- Get all hypergraph nodes by their label.
+-- @param ast AST tree produced by luametrics
+-- @param label label string
+-- @return table of results
+local function get_hypergraph_nodes_by_label(ast, label)
+    local hypergraph = ast.hypergraph or ast
+    local result = {}
+
+    for node in pairs(hypergraph.Nodes) do
+        if node.label == label then
+            table.insert(result, node)
+        end
+    end
+
+    return result
 end
 
 --- Helper function to print table.
@@ -239,6 +256,7 @@ return {
     get_graph_flag_count = get_graph_flag_count,
     -- luametrics hypergraph
     print_all_hypergraph_calls = print_all_hypergraph_calls,
+    get_hypergraph_nodes_by_label = get_hypergraph_nodes_by_label,
     -- generic
     print_table = print_table,
     live_table = live_table,
