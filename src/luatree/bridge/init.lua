@@ -20,10 +20,10 @@ local EXTERNAL_GLOBAL_FUNCTION_LABEL = "eGlobalFunction"
 -- @param id Should be unique nodeid
 -- @param data Data from luadb hypergraph.globalFunctions
 -- @param name Function name
-local function create_eglobal_function_node(id, data, name)
+local function create_eglobal_function_node(id, name)
     local node = HG.N(EXTERNAL_GLOBAL_FUNCTION_LABEL)
     node.nodeid = id
-    node.data = data
+    node.data = {}
     node.data.name = name
     node.data.position = -1
 
@@ -91,11 +91,17 @@ local function merge_graph_into_AST(data_ast, data_graph, create_new_nodes)
             -- This is a top-level call, we will set "from" as STARTPOINT
             elseif node.label == "STARTPOINT" and from_position == nil then
                 from = node
+            
+            -- If eGlobalFunction exists, check it
+            elseif node.label == EXTERNAL_GLOBAL_FUNCTION_LABEL and to_position == nil then
+                if node.data.name == to_function_name then
+                    to = node
+                end
             end
 
             -- Break if we have all the info necessary
             if from ~= nil and (to ~= nil or to_position == nil) and actual_call ~= nil then
-                break
+                -- break
             end
         end
 
@@ -106,7 +112,7 @@ local function merge_graph_into_AST(data_ast, data_graph, create_new_nodes)
                 -- There might be multiple calls
                 for _, v in ipairs(data_graph.globalCalls[to_function_name]) do
                     if v.data.position == call_position then
-                        to = create_eglobal_function_node(node_id, v.data, to_function_name)
+                        to = create_eglobal_function_node(node_id, to_function_name)
 
                         node_id = node_id - 1
                     end
@@ -118,7 +124,7 @@ local function merge_graph_into_AST(data_ast, data_graph, create_new_nodes)
                 -- There might be multiple calls
                 for _, v in ipairs(data_graph.moduleCalls[to_function_name]) do
                     if v.data.position == call_position then
-                        to = create_eglobal_function_node(node_id, v.data, to_function_name)
+                        to = create_eglobal_function_node(node_id, to_function_name)
 
                         node_id = node_id - 1
                     end
