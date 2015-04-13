@@ -98,11 +98,6 @@ local function merge_graph_into_AST(data_ast, data_graph, create_new_nodes)
                     to = node
                 end
             end
-
-            -- Break if we have all the info necessary
-            if from ~= nil and (to ~= nil or to_position == nil) and actual_call ~= nil then
-                -- break
-            end
         end
 
         -- At this point, "to" might be nil but we might want to create a new node from the globalFunctions info
