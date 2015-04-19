@@ -147,7 +147,7 @@ local function print_all_hypergraph_calls(ast)
 
     for node in pairs(hypergraph.Nodes) do
         for incidence, edge in pairs(hypergraph[node]) do
-            if incidence.label == 'caller' and edge.label == 'call' then
+            if incidence.label == "caller" and edge.label == "call" then
                 local nodename = node.data.name or node.label
                 local message = "Caller: " .. nodename .. " (" .. node.label .. ") @ " .. node.data.position .. "; "
 
@@ -163,6 +163,19 @@ local function print_all_hypergraph_calls(ast)
             end
         end
     end
+end
+
+local function count_all_hypergraph_calls(ast)
+    local hypergraph = ast.hypergraph or ast
+    local count = 0
+
+    for edge in pairs(hypergraph.Edges) do
+        if edge.label == "call" then
+            count = count + 1
+        end
+    end
+
+    return count
 end
 
 --- Get all hypergraph nodes by their label.
@@ -256,6 +269,7 @@ return {
     get_graph_flag_count = get_graph_flag_count,
     -- luametrics hypergraph
     print_all_hypergraph_calls = print_all_hypergraph_calls,
+    count_all_hypergraph_calls = count_all_hypergraph_calls,
     get_hypergraph_nodes_by_label = get_hypergraph_nodes_by_label,
     -- generic
     print_table = print_table,

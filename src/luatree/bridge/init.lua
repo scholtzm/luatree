@@ -8,6 +8,7 @@
 local ast = require("luatree.ast")
 local graph = require("luatree.graph")
 local utils = require("luatree.utils")
+local HG = require("hypergraph")
 
 ---------------------------------------------
 -- Constants & Private methods
