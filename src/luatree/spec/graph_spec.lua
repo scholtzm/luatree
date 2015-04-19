@@ -19,7 +19,7 @@ describe("graph submodule", function()
   
     setup(function()
         graph = require("graph")
-        ast = require("ast")
+        ast = require("ast.tree")
         utils = require("utils")
     end) 
   

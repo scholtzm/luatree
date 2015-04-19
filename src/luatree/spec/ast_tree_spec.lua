@@ -1,13 +1,13 @@
 ---------------------------------------------
--- Tests for AST submodule
+-- Tests for AST tree submodule
 -- @author: Michael Scholtz
 ---------------------------------------------
 
-describe("ast submodule", function()
+describe("ast tree submodule", function()
     local ast, utils
   
     setup(function()
-        ast = require("ast")
+        ast = require("ast.tree")
         utils = require("utils")
     end) 
   
