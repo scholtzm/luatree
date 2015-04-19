@@ -42,7 +42,7 @@ Do not forget to read the comments.
 ## Tests
 
 luatree tests use [busted](http://olivinelabs.com/busted/) library for their core functionality.
-Once you have this module installed, simply run the following command from the `src` directory:
+Once you have busted and luatree installed, simply run the following command from the `src` directory:
 
 ```sh
 $ busted
