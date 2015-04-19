@@ -1,5 +1,5 @@
 ---------------------------------------------
--- Hyprgraph module
+-- Hypergraph module
 -- Hypergraph toolkit for Lua
 -- @author: Michael Scholtz
 ---------------------------------------------
@@ -107,7 +107,7 @@ local function find_node_pairs(old_hypergraph, new_hypergraph, vertex_list)
         elseif old_node.label == "FunctionGroup" or
                old_node.label == "AssignGroup" or
                old_node.label == "OthersGroup" then
-            local old_parent = get_group_parent(hypergraph, old_node)
+            local old_parent = get_group_parent(old_hypergraph, old_node)
 
             for node in pairs(new_hypergraph.Nodes) do
                 if node.label == old_node.label then
