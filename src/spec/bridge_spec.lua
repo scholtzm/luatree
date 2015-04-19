@@ -19,13 +19,10 @@ describe("bridge submodule", function()
     ]==]
   
     setup(function()
-        graph = require("graph")
-        bridge = require("bridge")
-        utils = require("utils")
-    end)
-
-    before_each(function()
-        ast = require("ast.tree")
+        ast = require("luatree.ast.tree")
+        graph = require("luatree.graph")
+        bridge = require("luatree.bridge")
+        utils = require("luatree.utils")
     end)
   
     it("merges luadb graph data - soft", function()

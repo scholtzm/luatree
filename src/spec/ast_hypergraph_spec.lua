@@ -41,9 +41,9 @@ local function __b()
     }
   
     setup(function()
-        ast = require("ast.tree")
-        hypergraph = require("ast.hypergraph")
-        utils = require("utils")
+        ast = require("luatree.ast.tree")
+        hypergraph = require("luatree.ast.hypergraph")
+        utils = require("luatree.utils")
 
         tree = ast.get_tree(code_full)
     end)

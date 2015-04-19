@@ -18,9 +18,9 @@ describe("graph submodule", function()
     ]==]
   
     setup(function()
-        graph = require("graph")
-        ast = require("ast.tree")
-        utils = require("utils")
+        graph = require("luatree.graph")
+        ast = require("luatree.ast.tree")
+        utils = require("luatree.utils")
     end) 
   
     it("gives me graph from string", function()

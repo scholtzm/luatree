@@ -7,8 +7,8 @@ describe("ast tree submodule", function()
     local ast, utils
   
     setup(function()
-        ast = require("ast.tree")
-        utils = require("utils")
+        ast = require("luatree.ast.tree")
+        utils = require("luatree.utils")
     end) 
   
     it("gives me ast tree from string", function()

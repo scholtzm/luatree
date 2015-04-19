@@ -3,5 +3,5 @@
 # Files
 ast_test.lua
 graph_test.lua
-.random.lua
+template.lua
 .DS_Store
