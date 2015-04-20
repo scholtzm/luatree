@@ -61,6 +61,7 @@ local function merge_graph_into_AST(data_ast, data_graph, create_new_nodes)
         local call_position = edge.data.position
         local to_position = nil
         local to_function_name = edge.meta.calledFunction
+        local flag = edge.flag
 
         -- "from" might be empty for top-level calls
         if utils.live_table(edge.from) then
@@ -130,6 +131,11 @@ local function merge_graph_into_AST(data_ast, data_graph, create_new_nodes)
 
         -- Add new incidence data to edges and nodes
         local new_edge = HG.E'call'
+
+        if flag ~= nil then
+            new_edge.data = {}
+            new_edge.data.flag = flag
+        end
 
         hypergraph:AddEdgesFromNodeData(from, { [HG.I'caller'] = new_edge })
         hypergraph:AddNodesFromEdgeData(new_edge, { [HG.I'caller'] = from })
