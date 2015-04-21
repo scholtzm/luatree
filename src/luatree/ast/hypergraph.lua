@@ -30,6 +30,78 @@ local function get_group_parent(hypergraph, node)
     return nil
 end
 
+--- Get definer
+-- This function will get the closest definer.
+-- Useful for global and local funcitons.
+-- @param hypergraph Hypergraph provided by luametrics.
+-- @param node Hypergraph node.
+-- @return Definer node.
+local function get_definer(hypergraph, node)
+    local IDMAX = 9999999999
+    local parent_node = nil
+
+    for incidence, edge in pairs(hypergraph[node]) do
+        if incidence.label == "function" and edge.label == "defines" then
+            for incidence, node in pairs(hypergraph[edge]) do
+                if incidence.label == "definer" then
+                    print(node)
+                    if utils.get_hypergraph_id_number(node.id) < IDMAX then
+                        IDMAX = utils.get_hypergraph_id_number(node.id)
+                        parent_node = node
+                    end
+                end
+            end
+        end
+    end
+
+    return parent_node
+end
+
+--- Get definer
+-- This function will get the closest executor.
+-- Useful for assigns or function calls.
+-- @param hypergraph Hypergraph provided by luametrics.
+-- @param node Hypergraph node.
+-- @return Executor node.
+local function get_executor(hypergraph, node)
+    local IDMAX = 9999999999
+    local parent_node = nil
+
+    for incidence, edge in pairs(hypergraph[node]) do
+        if incidence.label == "statement" and edge.label == "executes" then
+            for incidence, node in pairs(hypergraph[edge]) do
+                if incidence.label == "executor" then
+                    if utils.get_hypergraph_id_number(node.id) < IDMAX then
+                        IDMAX = utils.get_hypergraph_id_number(node.id)
+                        parent_node = node
+                    end
+                end
+            end
+        end
+    end
+
+    return parent_node
+end
+
+--- Get parent
+-- This function will get the the parent by their treerelation.
+-- @param hypergraph Hypergraph provided by luametrics.
+-- @param node Hypergraph node.
+-- @return Parent node.
+local function get_parent(hypergraph, node)
+    for incidence, edge in pairs(hypergraph[node]) do
+        if incidence.label == "child" and edge.label == "treerelation" then
+            for incidence, node in pairs(hypergraph[edge]) do
+                if incidence.label == "parent" then
+                    return node
+                end
+            end
+        end
+    end
+
+    return nil 
+end
+
 ---------------------------------------------
 -- Public methods
 ---------------------------------------------
@@ -67,6 +139,19 @@ end
 local function find_node_pairs(old_hypergraph, new_hypergraph, vertex_list)
     local new_vertex_list = {}
 
+    -- Vertexes must be sorted from lowest to highest
+    table.sort(vertex_list, function(a, b)
+        return utils.get_hypergraph_id_number(a) < utils.get_hypergraph_id_number(b)
+    end)
+
+    local sorted_keys = {}
+    for key in pairs(new_hypergraph.Nodes) do
+        table.insert(sorted_keys, key.id)
+    end
+    table.sort(sorted_keys, function(a, b)
+        return utils.get_hypergraph_id_number(a) < utils.get_hypergraph_id_number(b)
+    end)
+
     for _, vid in ipairs(vertex_list) do
         local old_node = old_hypergraph[vid]
 
@@ -83,20 +168,44 @@ local function find_node_pairs(old_hypergraph, new_hypergraph, vertex_list)
                old_node.label == "LocalAssign" or
                old_node.label == "Assign" then
             local best_candidate = nil
-            for node in pairs(new_hypergraph.Nodes) do
+            local old_parent = get_parent(old_hypergraph, old_node)
+
+            for _, key in pairs(sorted_keys) do
+                local node = new_hypergraph[key]
+
                 if old_node.label == node.label then
-                    if old_node.data.str == node.data.str then
+                    local new_parent = get_parent(new_hypergraph, node)
+
+                    if old_parent.data.str == new_parent.data.str then
                         best_candidate = node.id
-                        break
+                        if old_parent.data.position == new_parent.data.position then
+                            break
+                        end
                     end
 
-                    if old_node.data.position == node.data.position then
+                    if old_parent.data.position == new_parent.data.position then
                         best_candidate = node.id
                     end
                 end
             end
 
-            new_vertex_list[vid] = best_candidate   
+            new_vertex_list[vid] = best_candidate 
+
+            -- local best_candidate = nil
+            -- for node in pairs(new_hypergraph.Nodes) do
+            --     if old_node.label == node.label then
+            --         if old_node.data.str == node.data.str then
+            --             best_candidate = node.id
+            --             break
+            --         end
+
+            --         if old_node.data.position == node.data.position then
+            --             best_candidate = node.id
+            --         end
+            --     end
+            -- end
+
+            -- new_vertex_list[vid] = best_candidate
         elseif old_node.label == "eGlobalFunction" then
             for node in pairs(new_hypergraph.Nodes) do
                 if old_node.label == node.label and old_node.data.name == node.data.name then

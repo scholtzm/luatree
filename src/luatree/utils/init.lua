@@ -195,6 +195,14 @@ local function get_hypergraph_nodes_by_label(ast, label)
     return result
 end
 
+--- Get ID number
+-- Get number part of the ID from hypergraph node, edge or incidence.
+-- @param id ID string.
+-- @return number
+local function get_hypergraph_id_number(id)
+    return tonumber(string.sub(id, 2))
+end
+
 --- Helper function to print table.
 -- @param table Lua table
 local function print_table(table)
@@ -271,6 +279,7 @@ return {
     print_all_hypergraph_calls = print_all_hypergraph_calls,
     count_all_hypergraph_calls = count_all_hypergraph_calls,
     get_hypergraph_nodes_by_label = get_hypergraph_nodes_by_label,
+    get_hypergraph_id_number = get_hypergraph_id_number,
     -- generic
     print_table = print_table,
     live_table = live_table,
