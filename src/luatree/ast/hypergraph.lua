@@ -190,22 +190,6 @@ local function find_node_pairs(old_hypergraph, new_hypergraph, vertex_list)
             end
 
             new_vertex_list[vid] = best_candidate 
-
-            -- local best_candidate = nil
-            -- for node in pairs(new_hypergraph.Nodes) do
-            --     if old_node.label == node.label then
-            --         if old_node.data.str == node.data.str then
-            --             best_candidate = node.id
-            --             break
-            --         end
-
-            --         if old_node.data.position == node.data.position then
-            --             best_candidate = node.id
-            --         end
-            --     end
-            -- end
-
-            -- new_vertex_list[vid] = best_candidate
         elseif old_node.label == "eGlobalFunction" then
             for node in pairs(new_hypergraph.Nodes) do
                 if old_node.label == node.label and old_node.data.name == node.data.name then
