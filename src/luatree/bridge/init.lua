@@ -26,7 +26,6 @@ local function create_eglobal_function_node(id, name)
     node.nodeid = id
     node.data = {}
     node.data.name = name
-    node.data.position = -1
 
     return node
 end
@@ -78,28 +77,30 @@ local function merge_graph_into_AST(data_ast, data_graph, create_new_nodes)
         local to = nil
         local actual_call = nil
 
-        for node in pairs(hypergraph.Nodes) do
-            if node.label == "LocalFunction" or node.label == "GlobalFunction" then
-                if node.data.position == from_position then
-                    from = node
-                elseif node.data.position == to_position then
-                    to = node
-                end
-            elseif node.label == "FunctionCall" or node.label == "_PrefixExp" then
-                if node.data.position == call_position then
-                    actual_call = node
-                end
+        -- We will create a cache for certain node types (the ones we are interested in)
+        local cache = {}
 
-            -- This is a top-level call, we will set "from" as STARTPOINT
-            elseif node.label == "STARTPOINT" and from_position == nil then
-                from = node
-            
-            -- If eGlobalFunction exists, check it
-            elseif node.label == EXTERNAL_GLOBAL_FUNCTION_LABEL and to_position == nil then
-                if node.data.name == to_function_name then
-                    to = node
-                end
+        for node in pairs(hypergraph.Nodes) do
+            if node.label == "LocalFunction" or
+               node.label == "GlobalFunction" or
+               node.label == "FunctionCall" or
+               node.label == "STARTPOINT" or
+               node.label == EXTERNAL_GLOBAL_FUNCTION_LABEL then
+                local key = node.data.position or node.data.name
+                cache[key] = node
             end
+        end
+
+        from = cache[from_position]
+        to = cache[to_position]
+        actual_call = cache[call_position]
+
+        if from_position == nil then
+            from = cache[1]
+        end
+
+        if to_position == nil then
+            to = cache[to_function_name]
         end
 
         -- At this point, "to" might be nil but we might want to create a new node from the globalFunctions info
