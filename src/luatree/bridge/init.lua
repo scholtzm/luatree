@@ -65,6 +65,11 @@ local function merge_graph_into_AST(data_ast, data_graph, create_new_nodes)
            node.label == "STARTPOINT" or
            node.label == EXTERNAL_GLOBAL_FUNCTION_LABEL then
             local key = node.data.position or node.data.name
+
+            if node.label == "STARTPOINT" then
+                key = 0
+            end
+
             cache[key] = node
         end
     end
@@ -92,10 +97,12 @@ local function merge_graph_into_AST(data_ast, data_graph, create_new_nodes)
         local to = cache[to_position]
         local actual_call = cache[call_position]
 
+        -- This is a top-level call
         if from_position == nil then
-            from = cache[1]
+            from = cache[0]
         end
 
+        -- Calling eGlobalFunction
         if to_position == nil then
             to = cache[to_function_name]
         end
