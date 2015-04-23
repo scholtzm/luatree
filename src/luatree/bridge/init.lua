@@ -55,6 +55,21 @@ local function merge_graph_into_AST(data_ast, data_graph, create_new_nodes)
     local node_id = -1
     local hypergraph = data_ast.hypergraph
 
+    -- We will create a cache for certain node types (the ones we are interested in)
+    local cache = {}
+
+    for node in pairs(hypergraph.Nodes) do
+        if node.label == "LocalFunction" or
+           node.label == "GlobalFunction" or
+           node.label == "FunctionCall" or
+           node.label == "STARTPOINT" or
+           node.label == EXTERNAL_GLOBAL_FUNCTION_LABEL then
+            local key = node.data.position or node.data.name
+            cache[key] = node
+        end
+    end
+
+    -- We will add every functio call (edge)
     for _, edge in ipairs(data_graph.edges) do
         local from_position = nil
         local call_position = edge.data.position
@@ -73,27 +88,9 @@ local function merge_graph_into_AST(data_ast, data_graph, create_new_nodes)
         end
 
         -- These will be actual hypergraph nodes
-        local from = nil
-        local to = nil
-        local actual_call = nil
-
-        -- We will create a cache for certain node types (the ones we are interested in)
-        local cache = {}
-
-        for node in pairs(hypergraph.Nodes) do
-            if node.label == "LocalFunction" or
-               node.label == "GlobalFunction" or
-               node.label == "FunctionCall" or
-               node.label == "STARTPOINT" or
-               node.label == EXTERNAL_GLOBAL_FUNCTION_LABEL then
-                local key = node.data.position or node.data.name
-                cache[key] = node
-            end
-        end
-
-        from = cache[from_position]
-        to = cache[to_position]
-        actual_call = cache[call_position]
+        local from = cache[from_position]
+        local to = cache[to_position]
+        local actual_call = cache[call_position]
 
         if from_position == nil then
             from = cache[1]
@@ -111,6 +108,7 @@ local function merge_graph_into_AST(data_ast, data_graph, create_new_nodes)
                 for _, v in ipairs(data_graph.globalCalls[to_function_name]) do
                     if v.data.position == call_position then
                         to = create_eglobal_function_node(node_id, to_function_name)
+                        cache[to.data.name] = to
 
                         node_id = node_id - 1
                     end
@@ -123,6 +121,7 @@ local function merge_graph_into_AST(data_ast, data_graph, create_new_nodes)
                 for _, v in ipairs(data_graph.moduleCalls[to_function_name]) do
                     if v.data.position == call_position then
                         to = create_eglobal_function_node(node_id, to_function_name)
+                        cache[to.data.name] = to
 
                         node_id = node_id - 1
                     end
