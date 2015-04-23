@@ -169,32 +169,36 @@ end
 -- @param graph_new New function call graph returned from `get_graph` function
 -- @param graph_old Old function call graph returned from `get_graph` function
 local function compare(graph_old, graph_new)
+    -- To speed up things, we will use internal cache
+    local cache = setmetatable({}, { __index = function() return 0 end })
 
     -- Let's compare list of nodes first
-    for i, v in ipairs(graph_new.nodes) do
-        for ii, vv in ipairs(graph_old.nodes) do
-            if vv.flag ~= "visited" and v.data.name == vv.data.name then
-                v.flag = "identical"
-                vv.flag = "visited"
-                break
-            end
-        end
-        if v.flag == nil then
-            v.flag = "created"
+    for _, old_node in ipairs(graph_old.nodes) do
+        cache[old_node.data.name] = cache[old_node.data.name] + 1
+    end
+
+    for _, new_node in ipairs(graph_new.nodes) do
+        if cache[new_node.data.name] > 0 then
+            cache[new_node.data.name] = cache[new_node.data.name] - 1
+            new_node.flag = "identical"
+        else
+            new_node.flag = "created"
         end
     end
 
     -- Compare edges
-    for i, v in ipairs(graph_new.edges) do
-        for ii, vv in ipairs(graph_old.edges) do
-            if vv.flag ~= "visited" and equal_edges(v, vv) then
-                v.flag = "identical"
-                vv.flag = "visited"
-                break
-            end
-        end
-        if v.flag == nil then
-            v.flag = "created"
+    for _, old_edge in ipairs(graph_old.edges) do
+        local hash = edge_hash(old_edge)
+        cache[hash] = cache[hash] + 1
+    end
+
+    for _, new_edge in ipairs(graph_new.edges) do
+        local hash = edge_hash(new_edge)
+        if cache[hash] > 0 then
+            cache[hash] = cache[hash] - 1
+            new_edge.flag = "identical"
+        else
+            new_edge.flag = "created"
         end
     end
 end

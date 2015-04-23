@@ -174,7 +174,7 @@ local function find_node_pairs(old_hypergraph, new_hypergraph, vertex_list)
                         end
                     end
                 end
-            -- STARTPOINT, Function, Function, Assign, If, While, Do, For, etc...
+            -- STARTPOINT, Function, LastStat, Assign, If, While, Do, For, etc...
             else
                 for node in pairs(new_hypergraph.Nodes) do
                     if old_node.label == node.label then
