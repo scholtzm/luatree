@@ -59,7 +59,8 @@ local function merge_graph_into_AST(data_ast, data_graph, create_new_nodes)
     local cache = {}
 
     for node in pairs(hypergraph.Nodes) do
-        if node.label == "LocalFunction" or
+        if node.label == "Function" or
+           node.label == "LocalFunction" or
            node.label == "GlobalFunction" or
            node.label == "FunctionCall" or
            node.label == "STARTPOINT" or
