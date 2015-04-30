@@ -25,7 +25,22 @@ local function edge_hash(edge)
     local edge_to = edge.meta.calledFunction
     local edge_text = edge.data.text
 
-    return tostring(edge_from) .. SEPARATOR .. tostring(edge_to) .. SEPARATOR .. tostring(edge_text)
+    local edge_from_tag = ""
+    local edge_to_tag = ""
+
+    if utils.live_table(edge.from) then
+        edge_from_tag = edge.from[1].data.tag
+    end
+
+    if utils.live_table(edge.to) then
+        edge_to_tag = edge.to[1].data.tag
+    end
+
+    return tostring(edge_from_tag) .. SEPARATOR ..
+           tostring(edge_from) .. SEPARATOR ..
+           tostring(edge_to_tag) .. SEPARATOR ..
+           tostring(edge_to) .. SEPARATOR ..
+           tostring(edge_text)
 end
 
 --- Get edge information from its hash.

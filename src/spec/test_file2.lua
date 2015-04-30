@@ -22,6 +22,7 @@ local function mergeTbls(tbl1, tbl2)
     testTbl(tbl1) -- function call 7
     testTbl(tbl2) -- function call 8
     testTbl(tbl1) -- added
+    -- this call will change callee type since the proceedMerge method is no longer defined as local
     if proceedMerge(tbl1, tbl2) then
         printMessage("succeed") -- function call 9
     else
