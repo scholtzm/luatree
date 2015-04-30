@@ -215,9 +215,7 @@ end
 -- Detects non-empty tables.
 -- @param table Lua table
 local function live_table(table)
-    assert(type(table) == "table", "function parameter must be type of table")
-
-    if next(table) == nil then
+    if table == nil or type(table) ~= "table" or next(table) == nil then
         return false
     end
 
