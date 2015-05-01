@@ -26,10 +26,10 @@ Using luatree is pretty simple ...
 ```lua
 local luatree = require("luatree")
 
-local tree_a = luatree.ast.get_tree("local a")
-local tree_b = luatree.ast.get_tree("local b")
+local tree_a = luatree.ast.tree.get_tree("local a")
+local tree_b = luatree.ast.tree.get_tree("local b")
 
-luatree.ast.compare(tree_a, tree_b)
+luatree.ast.tree.compare(tree_a, tree_b)
 
 local changed_nodes = luatree.utils.get_tree_flag_count(tree_b, "modified")
 
