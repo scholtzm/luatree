@@ -146,45 +146,49 @@ local function find_node_pairs(old_hypergraph, new_hypergraph, vertex_list)
 
             local old_node = old_hypergraph[vid]
 
-            -- eGlobalFunctions are unknown to us. We use label and name.
-            if old_node.label == "eGlobalFunction" then
-                for node in pairs(new_hypergraph.Nodes) do
-                    if old_node.label == node.label then
-                        if old_node.data.name == node.data.name then
-                            new_vertex_list[vid] = node.id
-                            break
-                        end
-                    end
-                end
-            -- Groups have nothing which could help us with comparison. We use their parents instead.
-            elseif old_node.label == "FunctionGroup" or
-                   old_node.label == "AssignGroup" or
-                   old_node.label == "OthersGroup" then
-                local old_parent = get_group_parent(old_hypergraph, old_node)
+            if old_node ~= nil then
 
-                for node in pairs(new_hypergraph.Nodes) do
-                    if node.label == old_node.label then
-                        local new_parent = get_group_parent(new_hypergraph, node)
-
-                        if old_parent.label == new_parent.label then
-                            if old_parent.data.position == new_parent.data.position then
+                -- eGlobalFunctions are unknown to us. We use label and name.
+                if old_node.label == "eGlobalFunction" then
+                    for node in pairs(new_hypergraph.Nodes) do
+                        if old_node.label == node.label then
+                            if old_node.data.name == node.data.name then
                                 new_vertex_list[vid] = node.id
                                 break
                             end
                         end
                     end
-                end
-            -- STARTPOINT, Function, LastStat, Assign, If, While, Do, For, etc...
-            else
-                for node in pairs(new_hypergraph.Nodes) do
-                    if old_node.label == node.label then
-                        if old_node.data.position == node.data.position then
-                            new_vertex_list[vid] = node.id 
-                            break
+                -- Groups have nothing which could help us with comparison. We use their parents instead.
+                elseif old_node.label == "FunctionGroup" or
+                       old_node.label == "AssignGroup" or
+                       old_node.label == "OthersGroup" then
+                    local old_parent = get_group_parent(old_hypergraph, old_node)
+
+                    for node in pairs(new_hypergraph.Nodes) do
+                        if node.label == old_node.label then
+                            local new_parent = get_group_parent(new_hypergraph, node)
+
+                            if old_parent.label == new_parent.label then
+                                if old_parent.data.position == new_parent.data.position then
+                                    new_vertex_list[vid] = node.id
+                                    break
+                                end
+                            end
+                        end
+                    end
+                -- STARTPOINT, Function, LastStat, Assign, If, While, Do, For, etc...
+                else
+                    for node in pairs(new_hypergraph.Nodes) do
+                        if old_node.label == node.label then
+                            if old_node.data.position == node.data.position then
+                                new_vertex_list[vid] = node.id 
+                                break
+                            end
                         end
                     end
                 end
-            end
+
+            end -- old_node ~= nil
 
         end -- if not assigned
     end -- for each vid
