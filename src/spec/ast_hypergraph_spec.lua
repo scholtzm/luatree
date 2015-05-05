@@ -7,7 +7,7 @@ describe("ast hypergraph submodule", function()
     local ast, hypergraph, utils
     local tree
 
-    local code_full = [==[
+    local code_initial = [==[
         local function __a()
             __b()
         end
@@ -45,13 +45,13 @@ local function __b()
         hypergraph = require("luatree.ast.hypergraph")
         utils = require("luatree.utils")
 
-        tree = ast.get_tree(code_full)
+        tree = ast.get_tree(code_initial)
     end)
 
     it("patches the given text if it's not modified at all", function()
-        local patched_text = hypergraph.patch_text(tree.hypergraph, "N257", code_full)
+        local patched_text = hypergraph.patch_text(tree.hypergraph, "N257", code_initial)
 
-        assert.are.equal(code_full, patched_text)
+        assert.are.equal(code_initial, patched_text)
     end)
 
     it("patches the given text if the startpoint is modified", function()
