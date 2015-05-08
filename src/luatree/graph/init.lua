@@ -45,9 +45,9 @@ end
 
 --- Get edge information from its hash.
 -- @param edge Edge's hash
--- @return string Edge info: from, to, text
+-- @return string Edge info: from_tag, from, to_tag, to, text
 local function edge_from_hash(hash)
-    local values = { "", "", "" }
+    local values = { "", "", "", "", "" }
     local k = 1
 
     for i = 1, #hash do
