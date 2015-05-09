@@ -50,7 +50,7 @@ describe("graph submodule", function()
         assert.is_not.same(g_a, g_b)
     end)
 
-    it("compares two graphs trees", function()
+    it("compares two graphs", function()
         local file_a = "spec/test_file.lua"
         local file_b = "spec/test_file2.lua"
 
